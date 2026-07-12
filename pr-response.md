@@ -17,8 +17,30 @@ curl -X POST http://localhost:5000/watchlist/1/add \
 
 
 ## Comment 2 — Deduplication
-**What I did:**
-**How I verified:**
+**What I did:** Previously when a duplicate is detected, the function returns an unhandled database `IntegrityError` or silently succeeds with a new duplicate `WatchlistEntry` as the function doesn't have an explicit check for duplicate entries. To prevent this, I added `UniqueContraint`s in models.py to the `user_id` and `film_id` columns for the `WatchlistEntry` table. This ensures that when a new entry is created with matching `user_id` and `film_id` values, that a relevant error (`AlreadyInWatchlistError`) is raised and is handled with further error-checking implemented in `add_to_watchlist()`
+
+**How I verified:** I asked Claude to generate the following test case then later ran pytest after verifying the test.
+
+```python
+def test_add_to_watchlist_duplicate_raises(app, sample_user, sample_film):
+    """
+    Adding the same film to a user's watchlist twice should raise
+    AlreadyInWatchlistError, not silently create a duplicate entry.
+    """
+    with app.app_context():
+        add_to_watchlist(user_id=sample_user, film_id=sample_film)
+
+        with pytest.raises(AlreadyInWatchlistError):
+            add_to_watchlist(user_id=sample_user, film_id=sample_film)
+
+        # Confirm only one entry exists
+        count = WatchlistEntry.query.filter_by(
+            user_id=sample_user, film_id=sample_film
+        ).count()
+        assert count == 1
+```
+
+This test case passed, signifying that deduplication logic is handled as expected. 
 
 ## Comment 3 — Missing test
 **What I did:**
