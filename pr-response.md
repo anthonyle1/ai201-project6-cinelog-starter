@@ -48,9 +48,11 @@ This test case passed, signifying that deduplication logic is handled as expecte
 
 
 ## Comment 4 — Default visibility
-**My position:**
-**Reasoning:**
-**Tradeoff acknowledged:**
+**My position:** `public=True` refers to the database models for `WatchlistEntry` where in the current state of the app, all entries by default are publicly viewable by other users. My position on this is that the public column should stay as True.
+
+**Reasoning:** In production, CineLog would only be valuable to users if Watchlist entries are visible to other viewers. This default setting would minimize the changes in the API to set entries to publicly not viewable, especially if reviews are intended to be sharable by design. Automatically privated entries may lose CineLog in engagement as fewer posts would be shared to users.
+
+**Tradeoff acknowledged:** It's important to recognize that there could be some movies that are not socially acceptable to like or would be more questionable for a person to watch. Maybe a user is embarrassed to share they watched a certain movie. Additionally, it could be possible that the user is embarassed or does not want to share a polarizing rating to the average user. Having public-by-default posts may leak these moments that do not want to be shared, which could harm the platform's userbase.
 
 ## Comment 5 — Sort order
 **My position:**
