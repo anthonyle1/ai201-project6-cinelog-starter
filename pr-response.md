@@ -5,6 +5,12 @@
 
 I used Claude to help generate curl commands to help test the add_to_watchlist() function to see if the fucntion runs as expected for comment 1. I realized that there wasn't any function to seed any data, so when I was running the curl command, it was leading into SQLAlchemy related errors. I prompted the error statement, and utilized Claude to help seed in data in cinelog.db to be able to test the curl command as expected, with using a database visualizer to see the generated IDs.
 
+I used Claude to help guide me through rebasing, since I accidently opened another rebase and noticed a lot of my changes disappeared. It eventually led me to abort my rebase which retrived my previous rebase!
+
+I used Claude to help understand the tradeoffs of visibility with `public=True` and understand potential design decisions to make and eventual tradeoffs that may occur. I included these in my final discussion for this topic/
+
+Additionally, I used Claude to generate the test case for comment 3 and testing comment 2. I made sure to follow up to ensure the test works as intended and clarified any potential problems I had with the issue, such as with the test case using an exisiting database or not with generating test 3's test case. I ran pytest to ensure these new tests work as intended.
+
 ## Comment 1 — Rename
 **What I did:** I used CTRL-SHIFT-F to find all instances of save_to_watchlist() mentioned. I used all of these function names and their references to add_to_watchlist() as the comment mentioned. I additionally made sure to change the name of the import statement to ensure the tests are ran correctly. 
 **How I verified:** I ran `pytest` to ensure there is not any compilation errors. I further tested by using CURL to call the related endpoint and see if the function runs successfully. 
@@ -68,3 +74,35 @@ This test case passed, signifying that deduplication logic is handled as expecte
 
 ## PR Description
 <!-- Written at the end — feature overview, design decisions, manual testing steps -->
+
+**Feature Overview**
+
+Adds a Watchlist feature to CineLog, letting a user save films they intend to watch later. This mirrors the existing Collection feature's structure (model, service, routes) but tracks intent-to-watch rather than a rated, already-watched entry.
+
+**New endpoints**
+- `GET /watchlist/<user_id>` — returns the user's watchlist as a list of films, each annotated with `date_added` and `public`.
+- `POST /watchlist/<user_id>/add` — body `{ "film_id": <int> }`; adds a film to the user's watchlist.
+  - `404` if the film doesn't exist (`FilmNotFoundError`)
+  - `409` if the film is already on the user's watchlist (`AlreadyInWatchlistError`)
+  - `201` with the created entry on success
+
+**New model:** `WatchlistEntry` (`models.py`) — `id`, `user_id` (FK → `user`), `film_id` (FK → `film`), `date_added`, `public` (defaults to `True`), with a `UniqueConstraint` on `(user_id, film_id)` to enforce one watchlist entry per film per user at the database level.
+
+### Design decisions
+- **Naming:** the service function is named `add_to_watchlist()` (not `save_to_watchlist()`) for consistency with `add_to_collection()`.
+- **Deduplication:** rather than letting a duplicate insert raise a raw `IntegrityError`, `add_to_watchlist()` checks for an existing `(user_id, film_id)` entry up front and raises a dedicated `AlreadyInWatchlistError`, which the route maps to `409`. The `UniqueConstraint` on `WatchlistEntry` is a defense-in-depth backstop against race conditions, not the primary error path.
+- **Default visibility (`public=True`):** watchlist entries are public by default, matching the social/discovery value of the app — most users want their activity visible, and defaulting to private would suppress engagement. Acknowledged tradeoff: some users may want privacy for embarrassing or polarizing picks; that's left as a per-entry toggle rather than changing the default.
+- **Sort order:** `get_watchlist()` currently sorts alphabetically by film title (matching `get_collection()`'s existing behavior). Discussed switching both to sort by `date_added` (most-recent-first, falling back to alphabetical for ties) for consistency and to surface recent activity faster — flagged as a follow-up, not implemented in this PR.
+
+### Manual testing
+Ran the app locally and exercised both endpoints with seeded data (a user and film row) via curl:
+
+```
+curl -X POST http://localhost:5000/watchlist/1/add \
+  -H "Content-Type: application/json" \
+  -d '{"film_id": 1}'
+
+curl http://localhost:5000/watchlist/1
+```
+
+Additionally, using pytest tests changes that are made do not inhibit other parts of the code.
