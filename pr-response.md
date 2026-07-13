@@ -106,3 +106,5 @@ curl http://localhost:5000/watchlist/1
 ```
 
 Additionally, using pytest tests changes that are made do not inhibit other parts of the code.
+
+<img width="2070" height="784" alt="image" src="https://github.com/user-attachments/assets/93293b51-da6a-4fb7-9568-e1ca9da797e9" />
