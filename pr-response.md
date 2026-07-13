@@ -62,9 +62,9 @@ This test case passed, signifying that deduplication logic is handled as expecte
 **Engagement with reviewer's point:** We share a similar point, but I wanted to emphasize a potential edge case. The original code also sorts `get_collection()` by alphabetical, which could be better search capability by the user. However, I would argue for better consistency with using date added for the reason mentioend above. Additionally, it would allow the user to see changes made faster also.
 
 ## Comment 6 — Rebase
-**What conflicted:**
-**How I resolved it:**
-**How I verified no conflict remains:**
+**What conflicted:** I had a merge conflicts with `.gitignore` and `models.py`.
+**How I resolved it:** I accepted all changes from my commits using the VSCode editor. I had ChatGPT assist with what to do with what to do within the terminal. 
+**How I verified no conflict remains:** When I merged, I ensured code is still functional by running `pytest` and reviewing the changes once the code is rebased.
 
 ## PR Description
 <!-- Written at the end — feature overview, design decisions, manual testing steps -->
