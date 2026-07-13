@@ -43,8 +43,9 @@ def test_add_to_watchlist_duplicate_raises(app, sample_user, sample_film):
 This test case passed, signifying that deduplication logic is handled as expected. 
 
 ## Comment 3 — Missing test
-**What I did:**
-**How I verified:**
+**What I did:** I added the `test_add_to_watchlist_nonexistent_film_raises` test case to the `test_watchlist.py`. This function operates by creating a fake film id, then looking for the `FilmNotFoundError` returned in the passing scenario for the test case in `add_to_watchlist`
+**How I verified:** I ran `pytest tests/test_watchlist.py -v` to test if the test case works. I noticed that there could be a scenario that the fake film ID could be randomly generated, so I further prompted Claude to ask if this would be an issue, where the response mentioned that implementing this would be redundant since the `app` fixture resets the SQLite database.
+
 
 ## Comment 4 — Default visibility
 **My position:**
