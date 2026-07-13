@@ -55,9 +55,11 @@ This test case passed, signifying that deduplication logic is handled as expecte
 **Tradeoff acknowledged:** It's important to recognize that there could be some movies that are not socially acceptable to like or would be more questionable for a person to watch. Maybe a user is embarrassed to share they watched a certain movie. Additionally, it could be possible that the user is embarassed or does not want to share a polarizing rating to the average user. Having public-by-default posts may leak these moments that do not want to be shared, which could harm the platform's userbase.
 
 ## Comment 5 — Sort order
-**My position:**
-**Reasoning:**
-**Engagement with reviewer's point:**
+**My position:** I would use a sort order based on the time/date added to both `get_watchlist()` and `get_collection()`. If there are entries with the same time frame, then I would sort alphabetically.
+
+**Reasoning:** Users would most likely want to access their most recent contributions, sorting by recency would ensure their most recent contributions would be at the top, making it easier for the user to access in production, or the API to view for what the user wants (a recent contribution) faster. 
+
+**Engagement with reviewer's point:** We share a similar point, but I wanted to emphasize a potential edge case. The original code also sorts `get_collection()` by alphabetical, which could be better search capability by the user. However, I would argue for better consistency with using date added for the reason mentioend above. Additionally, it would allow the user to see changes made faster also.
 
 ## Comment 6 — Rebase
 **What conflicted:**
